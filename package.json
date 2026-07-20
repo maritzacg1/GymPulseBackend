@@ -1,0 +1,28 @@
+{
+  "name": "gympulsebackend",
+  "version": "1.0.0",
+  "description": "API REST para GymPulse AI",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "keywords": [],
+  "author": "Jean Medina",
+  "license": "ISC",
+  "dependencies": {
+    "@google/genai": "^2.12.0",
+    "axios": "^1.18.1",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.2.0",
+    "mysql2": "^3.22.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
