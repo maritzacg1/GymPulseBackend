@@ -22,7 +22,16 @@ import uploadRoutes from './routes/upload.routes.js';
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: [
+    'http://localhost:8100',
+    'http://127.0.0.1:8100'
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+app.options('*', cors());
 app.use(express.json());
 
 app.get('/', (req, res) => {
