@@ -191,6 +191,7 @@ export const updateUsuario = async (req, res) => {
 
     const { id } = req.params;
 
+
     const {
       id_rol,
       nombres,
@@ -200,28 +201,39 @@ export const updateUsuario = async (req, res) => {
       correo,
       fecha_nacimiento,
       genero,
-      foto
+      foto,
+      qr_codigo,
+      estado
     } = req.body;
 
-    // Obtener usuario actual
+
     const [usuarioActual] = await connmysql.query(
       'SELECT * FROM usuarios WHERE id_usuario = ?',
       [id]
     );
 
-    if (usuarioActual.length === 0) {
+
+    if(usuarioActual.length === 0){
 
       return res.status(404).json({
-        message: 'Usuario no encontrado'
+        message:'Usuario no encontrado'
       });
 
     }
 
+
     const usuario = usuarioActual[0];
+
+
+    const nuevoQR = qr_codigo || usuario.qr_codigo;
+
+    const nuevoEstado = estado ?? usuario.estado;
+
 
     await connmysql.query(
 
       `UPDATE usuarios SET
+
         id_rol = ?,
         nombres = ?,
         apellidos = ?,
@@ -233,9 +245,11 @@ export const updateUsuario = async (req, res) => {
         foto = ?,
         qr_codigo = ?,
         estado = ?
+
       WHERE id_usuario = ?`,
 
       [
+
         id_rol,
         nombres,
         apellidos,
@@ -244,36 +258,40 @@ export const updateUsuario = async (req, res) => {
         correo,
         fecha_nacimiento,
         genero,
-        foto,
-        usuario.qr_codigo, // conserva QR
-        1,                 // siempre activo
+        foto || usuario.foto,
+        nuevoQR,
+        nuevoEstado,
         id
+
       ]
 
     );
 
+
     res.json({
 
-      message: 'Usuario actualizado correctamente',
+      message:'Usuario actualizado correctamente',
 
-      qr_codigo: usuario.qr_codigo
+      qr_codigo:nuevoQR
 
     });
 
-  } catch (error) {
+
+  } catch(error){
+
 
     res.status(500).json({
 
-      message: 'Error al actualizar usuario',
+      message:'Error al actualizar usuario',
 
-      error: error.message
+      error:error.message
 
     });
+
 
   }
 
 };
-
 export const deleteUsuario = async (req, res) => {
   try {
     const { id } = req.params;
