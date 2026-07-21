@@ -57,6 +57,8 @@ Si preguntan otra cosa responde:
   } catch (error) {
 
     console.log('ERROR OPENROUTER');
+    console.log("OPENROUTER KEY:", process.env.OPENROUTER_API_KEY?.substring(0,15));
+console.log("MODELO:", "openrouter/free");
 
     console.log(
       error.response?.data || error.message
