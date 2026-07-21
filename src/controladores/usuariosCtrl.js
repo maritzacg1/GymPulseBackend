@@ -109,7 +109,9 @@ export const createUsuario = async (req, res) => {
       password,
       fecha_nacimiento,
       genero,
-      foto
+      foto,
+      especialidad,
+      experiencia
     } = req.body;
 
     const passwordHash = await bcrypt.hash(password, 10);
@@ -146,17 +148,38 @@ export const createUsuario = async (req, res) => {
 
     );
 
-    // id del usuario recién creado
     const idUsuario = result.insertId;
 
-    // Generar código QR
+    // Crear entrenador automáticamente
+    if (Number(id_rol) === 2) {
+
+      await connmysql.query(
+
+        `INSERT INTO entrenadores
+        (
+          id_usuario,
+          especialidad,
+          experiencia
+        )
+        VALUES (?, ?, ?)`,
+
+        [
+          idUsuario,
+          especialidad || '',
+          experiencia || ''
+        ]
+
+      );
+
+    }
+
     const qr = `GYMPULSE-${idUsuario}`;
 
     await connmysql.query(
 
       `UPDATE usuarios
-       SET qr_codigo=?
-       WHERE id_usuario=?`,
+       SET qr_codigo = ?
+       WHERE id_usuario = ?`,
 
       [qr, idUsuario]
 
@@ -164,11 +187,11 @@ export const createUsuario = async (req, res) => {
 
     res.status(201).json({
 
-      message:'Usuario registrado correctamente',
+      message: 'Usuario registrado correctamente',
 
-      id_usuario:idUsuario,
+      id_usuario: idUsuario,
 
-      qr_codigo:qr
+      qr_codigo: qr
 
     });
 
