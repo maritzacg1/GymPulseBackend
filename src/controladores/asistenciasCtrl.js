@@ -1,9 +1,11 @@
 import { connmysql } from '../db.js';
 
 export const getAsistencias = async (req, res) => {
+
   try {
+
     const [rows] = await connmysql.query(`
-      SELECT 
+      SELECT
         a.id_asistencia,
         a.fecha,
         a.hora_entrada,
@@ -15,63 +17,170 @@ export const getAsistencias = async (req, res) => {
         u.cedula,
         u.qr_codigo
       FROM asistencias a
-      INNER JOIN usuarios u ON a.id_usuario = u.id_usuario
-      ORDER BY a.fecha DESC, a.hora_entrada DESC
+      INNER JOIN usuarios u
+        ON a.id_usuario = u.id_usuario
+      ORDER BY a.fecha DESC,
+               a.hora_entrada DESC
     `);
 
     res.json(rows);
+
   } catch (error) {
-    res.status(500).json({ message: 'Error al listar asistencias', error: error.message });
+
+    console.error(error);
+
+    res.status(500).json({
+
+      message: 'Error al listar asistencias',
+
+      error: error.message
+
+    });
+
   }
+
 };
 
 export const registrarAsistenciaQR = async (req, res) => {
+
   try {
+
     const { qr_codigo } = req.body;
 
+    console.log("==================================");
+    console.log("QR recibido:", qr_codigo);
+
+    if (!qr_codigo) {
+
+      return res.status(400).json({
+
+        message: 'Debe enviar el código QR'
+
+      });
+
+    }
+
+    const codigo = qr_codigo.trim();
+
     const [usuario] = await connmysql.query(
-      'SELECT id_usuario, nombres, apellidos FROM usuarios WHERE qr_codigo = ? AND estado = 1',
-      [qr_codigo]
+
+      `SELECT
+          id_usuario,
+          nombres,
+          apellidos,
+          qr_codigo
+       FROM usuarios
+       WHERE TRIM(qr_codigo)=?
+       AND estado=1`,
+
+      [codigo]
+
     );
 
+    console.log("Usuario encontrado:", usuario);
+
     if (usuario.length === 0) {
-      return res.status(404).json({ message: 'QR no válido o usuario inactivo' });
+
+      return res.status(404).json({
+
+        message: 'QR no válido o usuario inactivo'
+
+      });
+
     }
 
     const id_usuario = usuario[0].id_usuario;
 
-    const [result] = await connmysql.query(
-      `INSERT INTO asistencias 
-      (id_usuario, fecha, hora_entrada, metodo_ingreso)
-      VALUES (?, CURDATE(), CURTIME(), 'QR')`,
+    const [asistenciaHoy] = await connmysql.query(
+
+      `SELECT id_asistencia
+       FROM asistencias
+       WHERE id_usuario=?
+       AND fecha=CURDATE()`,
+
       [id_usuario]
+
     );
 
-    res.status(201).json({
-      message: 'Asistencia registrada correctamente',
-      id_asistencia: result.insertId,
-      usuario: usuario[0]
-    });
-  } catch (error) {
-    res.status(500).json({ message: 'Error al registrar asistencia', error: error.message });
-  }
-};
-export const getMisAsistencias = async (req,res)=>{
+    if (asistenciaHoy.length > 0) {
 
-  try{
+      return res.json({
+
+        message: 'La asistencia ya fue registrada hoy.',
+
+        usuario: usuario[0]
+
+      });
+
+    }
+
+    const [result] = await connmysql.query(
+
+      `INSERT INTO asistencias
+      (
+        id_usuario,
+        fecha,
+        hora_entrada,
+        metodo_ingreso
+      )
+      VALUES
+      (
+        ?,
+        CURDATE(),
+        CURTIME(),
+        'QR'
+      )`,
+
+      [id_usuario]
+
+    );
+
+    console.log("Asistencia registrada:", result.insertId);
+
+    res.status(201).json({
+
+      message: 'Asistencia registrada correctamente',
+
+      id_asistencia: result.insertId,
+
+      usuario: usuario[0]
+
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+
+      message: 'Error al registrar asistencia',
+
+      error: error.message
+
+    });
+
+  }
+
+};
+
+export const getMisAsistencias = async (req, res) => {
+
+  try {
 
     const id_usuario = req.usuario.id_usuario;
 
     const [rows] = await connmysql.query(
 
-      `SELECT *
-
-      FROM asistencias
-
-      WHERE id_usuario = ?
-
-      ORDER BY fecha DESC,
-      hora_entrada DESC`,
+      `SELECT
+          id_asistencia,
+          fecha,
+          hora_entrada,
+          hora_salida,
+          metodo_ingreso
+       FROM asistencias
+       WHERE id_usuario=?
+       ORDER BY fecha DESC,
+                hora_entrada DESC`,
 
       [id_usuario]
 
@@ -79,13 +188,18 @@ export const getMisAsistencias = async (req,res)=>{
 
     res.json(rows);
 
-  }catch(error){
+  } catch (error) {
+
+    console.error(error);
 
     res.status(500).json({
 
-      error:error.message
+      message: 'Error al obtener asistencias',
+
+      error: error.message
 
     });
 
   }
+
 };
