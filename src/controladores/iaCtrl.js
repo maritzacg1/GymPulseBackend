@@ -1,34 +1,72 @@
-import { GoogleGenAI } from "@google/genai";
+import axios from 'axios';
 
 export const preguntarIA = async (req, res) => {
 
   try {
 
-    const apiKey = process.env.GEMINI_API_KEY;
+    const { pregunta } = req.body;
 
-    const ai = new GoogleGenAI({
-      apiKey
-    });
+    const response = await axios.post(
 
-    const response = await ai.models.generateContent({
+      'https://openrouter.ai/api/v1/chat/completions',
 
-      model: "gemini-2.5-flash",
+      {
+        model: 'mistralai/mistral-7b-instruct:free',
 
-      contents: req.body.pregunta
+        messages: [
+          {
+            role: 'system',
+            content: `
+Eres GymPulse AI.
 
-    });
+Solo respondes preguntas sobre:
+
+- gimnasio
+- ejercicios
+- entrenamiento
+- nutrición
+- salud
+- acondicionamiento físico
+
+Si preguntan otra cosa responde:
+
+"Solo puedo responder preguntas relacionadas con entrenamiento y salud."
+`
+          },
+          {
+            role: 'user',
+            content: pregunta
+          }
+        ]
+      },
+
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          'Content-Type': 'application/json'
+        }
+      }
+
+    );
 
     res.json({
-
-      respuesta: response.text
-
+      respuesta:
+        response.data.choices[0].message.content
     });
 
   } catch (error) {
 
-    console.log(error);
+    console.log('ERROR OPENROUTER');
 
-    res.status(500).json(error);
+    console.log(
+      error.response?.data || error.message
+    );
+
+    res.status(500).json({
+      message: 'Error IA',
+      error:
+        error.response?.data || error.message
+    });
 
   }
 
