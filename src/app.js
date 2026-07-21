@@ -1,8 +1,10 @@
 import dotenv from 'dotenv';
 
 dotenv.config();
+
 import express from 'express';
 import cors from 'cors';
+
 import usuariosRoutes from './routes/usuarios.routes.js';
 import authRoutes from './routes/auth.routes.js';
 import membresiasRoutes from './routes/membresias.routes.js';
@@ -25,13 +27,17 @@ const app = express();
 app.use(cors({
   origin: [
     'http://localhost:8100',
-    'http://127.0.0.1:8100'
+    'http://127.0.0.1:8100',
+    'https://localhost',
+    'capacitor://localhost'
   ],
+  credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.options('*', cors());
+
 app.use(express.json());
 
 app.get('/', (req, res) => {
@@ -56,6 +62,7 @@ app.use('/api', reportesRoutes);
 app.use('/api', iaRoutes);
 app.use('/api', historialRoutes);
 app.use('/api', uploadRoutes);
+
 app.use('/uploads', express.static('src/uploads'));
 
 export default app;
