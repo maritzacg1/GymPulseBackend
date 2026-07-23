@@ -54,7 +54,46 @@ export const getUsuarios = async (req, res) => {
 
 };
 
+/* ==========================================
+   LISTAR CLIENTES
+========================================== */
 
+export const getClientes = async (req, res) => {
+
+  try {
+
+    const [rows] = await connmysql.query(`
+
+      SELECT
+        id_usuario,
+        nombres,
+        apellidos,
+        correo,
+        cedula
+
+      FROM usuarios
+
+      WHERE id_rol = 3
+      AND estado = 1
+
+      ORDER BY nombres, apellidos
+
+    `);
+
+    res.json(rows);
+
+  } catch(error){
+
+    res.status(500).json({
+
+      message:'Error al listar clientes',
+      error:error.message
+
+    });
+
+  }
+
+};
 
 /* ==========================================
    BUSCAR USUARIO POR ID

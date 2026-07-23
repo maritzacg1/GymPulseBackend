@@ -8,7 +8,8 @@ import {
   createUsuario,
   updateUsuario,
   deleteUsuario,
-  actualizarFoto
+  actualizarFoto,
+   getClientes,
 } from '../controladores/usuariosCtrl.js';
 
 const router = Router();
@@ -21,7 +22,7 @@ router.get('/perfil', verifyToken, getPerfil);
 router.get('/usuarios/:id', getUsuarioById);
 
 router.post('/usuarios', createUsuario);
-
+router.get('/clientes', verifyToken, getClientes);
 
 // Primero FOTO
 router.put(
