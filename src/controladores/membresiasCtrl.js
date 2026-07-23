@@ -224,46 +224,5 @@ export const getMembresiasUsuario = async (req, res) => {
     });
   }
 };
-export const getMiMembresia = async (req,res)=>{
 
-  try{
-
-    const id_usuario=req.usuario.id_usuario;
-
-    const [rows]=await connmysql.query(`
-      SELECT
-        um.id_usuario_membresia,
-        um.fecha_inicio,
-        um.fecha_fin,
-        um.estado,
-        m.nombre,
-        m.descripcion,
-        m.precio,
-        m.duracion_dias
-      FROM usuario_membresia um
-      INNER JOIN membresias m
-        ON um.id_membresia=m.id_membresia
-      WHERE um.id_usuario=?
-      ORDER BY um.fecha_fin DESC
-      LIMIT 1
-    `,[id_usuario]);
-
-    if(rows.length==0){
-
-      return res.json(null);
-
-    }
-
-    res.json(rows[0]);
-
-  }catch(error){
-
-    res.status(500).json({
-      message:'Error al obtener la membresía',
-      error:error.message
-    });
-
-  }
   
-
-};
