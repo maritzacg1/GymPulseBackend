@@ -563,3 +563,32 @@ export const generarPDFPago = async (req, res) => {
   }
 
 };
+export const getMisPagos = async (req, res) => {
+
+  try {
+
+    const id_usuario = req.usuario.id_usuario;
+
+    const [rows] = await connmysql.query(`
+      SELECT
+        p.*,
+        m.nombre AS membresia
+      FROM pagos p
+      LEFT JOIN membresias m
+        ON p.id_membresia = m.id_membresia
+      WHERE p.id_usuario = ?
+      ORDER BY p.fecha_pago DESC
+    `,[id_usuario]);
+
+    res.json(rows);
+
+  } catch(error){
+
+    res.status(500).json({
+      message:'Error al obtener pagos',
+      error:error.message
+    });
+
+  }
+
+};
