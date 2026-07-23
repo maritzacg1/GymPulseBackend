@@ -1,62 +1,12 @@
 import { connmysql } from '../db.js';
 import { guardarHistorial } from './historialCtrl.js';
-export const getMiMembresia = async (req, res) => {
-
+export const getMembresias = async (req, res) => {
   try {
-
-    const id_usuario = req.usuario.id_usuario;
-
-    const [rows] = await connmysql.query(`
-
-      SELECT
-
-        um.id_usuario_membresia,
-        um.fecha_inicio,
-        um.fecha_fin,
-        um.estado,
-
-        m.id_membresia,
-        m.nombre,
-        m.descripcion,
-        m.precio,
-        m.duracion_dias
-
-      FROM usuario_membresia um
-
-      INNER JOIN membresias m
-      ON um.id_membresia = m.id_membresia
-
-      WHERE
-        um.id_usuario = ?
-        AND um.estado = 'Activa'
-        AND um.fecha_fin >= CURDATE()
-
-      ORDER BY um.fecha_fin DESC
-
-      LIMIT 1
-
-    `, [id_usuario]);
-
-    if (rows.length === 0) {
-
-      return res.json(null);
-
-    }
-
-    res.json(rows[0]);
-
+    const [rows] = await connmysql.query('SELECT * FROM membresias WHERE estado = 1');
+    res.json(rows);
   } catch (error) {
-
-    res.status(500).json({
-
-      message: 'Error al obtener la membresía',
-
-      error: error.message
-
-    });
-
+    res.status(500).json({ message: 'Error al listar membresías', error: error.message });
   }
-
 };
 
 export const getMembresiaById = async (req, res) => {
@@ -224,5 +174,61 @@ export const getMembresiasUsuario = async (req, res) => {
     });
   }
 };
+export const getMiMembresia = async (req, res) => {
 
-  
+  try {
+
+    const id_usuario = req.usuario.id_usuario;
+
+    const [rows] = await connmysql.query(`
+
+      SELECT
+
+        um.id_usuario_membresia,
+        um.fecha_inicio,
+        um.fecha_fin,
+        um.estado,
+
+        m.id_membresia,
+        m.nombre,
+        m.descripcion,
+        m.precio,
+        m.duracion_dias
+
+      FROM usuario_membresia um
+
+      INNER JOIN membresias m
+      ON um.id_membresia = m.id_membresia
+
+      WHERE
+        um.id_usuario = ?
+        AND um.estado = 'Activa'
+        AND um.fecha_fin >= CURDATE()
+
+      ORDER BY um.fecha_fin DESC
+
+      LIMIT 1
+
+    `, [id_usuario]);
+
+    if (rows.length === 0) {
+
+      return res.json(null);
+
+    }
+
+    res.json(rows[0]);
+
+  } catch (error) {
+
+    res.status(500).json({
+
+      message: 'Error al obtener la membresía',
+
+      error: error.message
+
+    });
+
+  }
+
+};
