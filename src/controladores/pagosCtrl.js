@@ -97,7 +97,11 @@ export const getPagoById = async (req, res) => {
 
 export const createPago = async (req, res) => {
 
+  const conexion = await connmysql.getConnection();
+
   try {
+
+    await conexion.beginTransaction();
 
     const {
       id_usuario,
@@ -108,7 +112,7 @@ export const createPago = async (req, res) => {
       comprobante
     } = req.body;
 
-    const [result] = await connmysql.query(
+    const [pago] = await conexion.query(
 
       `INSERT INTO pagos
       (
@@ -119,7 +123,7 @@ export const createPago = async (req, res) => {
         estado,
         comprobante
       )
-      VALUES (?, ?, ?, ?, ?, ?)`,
+      VALUES (?,?,?,?,?,?)`,
 
       [
         id_usuario,
@@ -131,6 +135,88 @@ export const createPago = async (req, res) => {
       ]
 
     );
+
+
+
+    const [membresia] = await conexion.query(
+
+      `SELECT duracion_dias
+       FROM membresias
+       WHERE id_membresia=?`,
+
+      [id_membresia]
+
+    );
+
+    const dias = membresia[0].duracion_dias;
+
+
+
+    const [actual] = await conexion.query(
+
+      `SELECT *
+       FROM usuario_membresia
+       WHERE id_usuario=?
+       ORDER BY fecha_fin DESC
+       LIMIT 1`,
+
+      [id_usuario]
+
+    );
+
+
+
+    let fechaInicio = new Date();
+
+    if(actual.length>0){
+
+      const finActual = new Date(actual[0].fecha_fin);
+
+      const hoy = new Date();
+
+      if(finActual > hoy){
+
+        fechaInicio = finActual;
+
+      }
+
+    }
+
+    const fechaFin = new Date(fechaInicio);
+
+    fechaFin.setDate(fechaFin.getDate()+dias);
+
+
+
+    await conexion.query(
+
+      `INSERT INTO usuario_membresia
+      (
+        id_usuario,
+        id_membresia,
+        fecha_inicio,
+        fecha_fin,
+        estado
+      )
+      VALUES(?,?,?,?,?)`,
+
+      [
+
+        id_usuario,
+
+        id_membresia,
+
+        fechaInicio.toISOString().substring(0,10),
+
+        fechaFin.toISOString().substring(0,10),
+
+        'Activa'
+
+      ]
+
+    );
+
+
 
     await guardarHistorial(
 
@@ -144,23 +230,37 @@ export const createPago = async (req, res) => {
 
     );
 
+
+
+    await conexion.commit();
+
     res.status(201).json({
 
-      message: 'Pago registrado correctamente',
+      message:'Pago registrado correctamente',
 
-      id_pago: result.insertId
+      id_pago:pago.insertId
 
     });
 
-  } catch (error) {
+  }
+
+  catch(error){
+
+    await conexion.rollback();
 
     res.status(500).json({
 
-      message: 'Error al registrar pago',
+      message:'Error al registrar pago',
 
-      error: error.message
+      error:error.message
 
     });
+
+  }
+
+  finally{
+
+    conexion.release();
 
   }
 
