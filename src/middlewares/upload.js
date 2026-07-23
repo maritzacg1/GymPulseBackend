@@ -1,64 +1,101 @@
-import multer from 'multer';
-import path from 'path';
+import { guardarHistorial } from './historialCtrl.js';
 
-const storage = multer.diskStorage({
+export const subirImagen = async (req, res) => {
 
-  destination(req, file, cb) {
+  try {
 
-    cb(null, 'src/uploads');
+    if (!req.file) {
 
-  },
+      return res.status(400).json({
 
-  filename(req, file, cb) {
+        message: 'No se recibió ninguna imagen'
 
-    const uniqueName =
+      });
 
-      Date.now() +
+    }
 
-      '-' +
+    await guardarHistorial(
 
-      Math.round(Math.random() * 1e9) +
+      req.usuario?.id_usuario || 0,
 
-      path.extname(file.originalname);
+      'UPLOADS',
 
-    cb(null, uniqueName);
+      'SUBIR_IMAGEN',
 
-  }
+      `Subió la imagen ${req.file.filename}`
 
-});
+    );
 
-const fileFilter = (req, file, cb) => {
+    res.json({
 
-  if (
+      message: 'Imagen subida correctamente',
 
-    file.mimetype.startsWith('image/') ||
+      archivo: req.file.filename,
 
-    file.mimetype.startsWith('video/')
+      ruta: `/uploads/${req.file.filename}`
 
-  ) {
+    });
 
-    cb(null, true);
+  } catch (error) {
 
-  } else {
+    res.status(500).json({
 
-    cb(new Error('Solo se permiten imágenes y videos'));
+      message: 'Error al subir imagen',
+
+      error: error.message
+
+    });
 
   }
 
 };
 
-const upload = multer({
+export const subirVideo = async (req, res) => {
 
-  storage,
+  try {
 
-  fileFilter,
+    if (!req.file) {
 
-  limits: {
+      return res.status(400).json({
 
-    fileSize: 100 * 1024 * 1024 // 100 MB
+        message: 'No se recibió ningún video'
+
+      });
+
+    }
+
+    await guardarHistorial(
+
+      req.usuario?.id_usuario || 0,
+
+      'UPLOADS',
+
+      'SUBIR_VIDEO',
+
+      `Subió el video ${req.file.filename}`
+
+    );
+
+    res.json({
+
+      message: 'Video subido correctamente',
+
+      archivo: req.file.filename,
+
+      ruta: `/uploads/${req.file.filename}`
+
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+
+      message: 'Error al subir video',
+
+      error: error.message
+
+    });
 
   }
 
-});
-
-export default upload;
+};

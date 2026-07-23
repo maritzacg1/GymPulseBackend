@@ -30,10 +30,10 @@ export const getPagos = async (req, res) => {
       FROM pagos p
 
       INNER JOIN usuarios u
-      ON p.id_usuario = u.id_usuario
+        ON p.id_usuario = u.id_usuario
 
       LEFT JOIN membresias m
-      ON p.id_membresia = m.id_membresia
+        ON p.id_membresia = m.id_membresia
 
       ORDER BY p.fecha_pago DESC
 
@@ -44,10 +44,8 @@ export const getPagos = async (req, res) => {
   } catch (error) {
 
     res.status(500).json({
-
       message: 'Error al listar pagos',
       error: error.message
-
     });
 
   }
@@ -56,7 +54,7 @@ export const getPagos = async (req, res) => {
 
 
 /* ==========================================
-   BUSCAR PAGO POR ID
+   OBTENER PAGO
 ========================================== */
 
 export const getPagoById = async (req, res) => {
@@ -66,19 +64,14 @@ export const getPagoById = async (req, res) => {
     const { id } = req.params;
 
     const [rows] = await connmysql.query(
-
       `SELECT * FROM pagos WHERE id_pago = ?`,
-
       [id]
-
     );
 
     if (rows.length === 0) {
 
       return res.status(404).json({
-
         message: 'Pago no encontrado'
-
       });
 
     }
@@ -88,10 +81,8 @@ export const getPagoById = async (req, res) => {
   } catch (error) {
 
     res.status(500).json({
-
       message: 'Error al buscar pago',
       error: error.message
-
     });
 
   }
@@ -108,14 +99,12 @@ export const createPago = async (req, res) => {
   try {
 
     const {
-
       id_usuario,
       id_membresia,
       monto,
       metodo_pago,
       estado,
       comprobante
-
     } = req.body;
 
     const [result] = await connmysql.query(
@@ -132,14 +121,12 @@ export const createPago = async (req, res) => {
       VALUES (?, ?, ?, ?, ?, ?)`,
 
       [
-
         id_usuario,
         id_membresia,
         monto,
         metodo_pago,
         estado || 'Pagado',
         comprobante || null
-
       ]
 
     );
@@ -190,14 +177,12 @@ export const updatePago = async (req, res) => {
     const { id } = req.params;
 
     const {
-
       id_usuario,
       id_membresia,
       monto,
       metodo_pago,
       estado,
       comprobante
-
     } = req.body;
 
     const [result] = await connmysql.query(
@@ -214,7 +199,6 @@ export const updatePago = async (req, res) => {
       WHERE id_pago = ?`,
 
       [
-
         id_usuario,
         id_membresia,
         monto,
@@ -222,7 +206,6 @@ export const updatePago = async (req, res) => {
         estado,
         comprobante || null,
         id
-
       ]
 
     );
