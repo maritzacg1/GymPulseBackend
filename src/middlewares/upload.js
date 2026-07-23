@@ -1,101 +1,64 @@
-import { guardarHistorial } from '../controladores/historialCtrl.js';
+import multer from 'multer';
+import path from 'path';
 
-export const subirImagen = async (req, res) => {
+const storage = multer.diskStorage({
 
-  try {
+  destination(req, file, cb) {
 
-    if (!req.file) {
+    cb(null, 'src/uploads');
 
-      return res.status(400).json({
+  },
 
-        message: 'No se recibió ninguna imagen'
+  filename(req, file, cb) {
 
-      });
+    const nombre =
 
-    }
+      Date.now() +
 
-    await guardarHistorial(
+      '-' +
 
-      req.usuario?.id_usuario || 0,
+      Math.round(Math.random() * 1e9) +
 
-      'UPLOADS',
+      path.extname(file.originalname);
 
-      'SUBIR_IMAGEN',
+    cb(null, nombre);
 
-      `Subió la imagen ${req.file.filename}`
+  }
 
-    );
+});
 
-    res.json({
+const fileFilter = (req, file, cb) => {
 
-      message: 'Imagen subida correctamente',
+  if (
 
-      archivo: req.file.filename,
+    file.mimetype.startsWith('image/') ||
 
-      ruta: `/uploads/${req.file.filename}`
+    file.mimetype.startsWith('video/')
 
-    });
+  ) {
 
-  } catch (error) {
+    cb(null, true);
 
-    res.status(500).json({
+  } else {
 
-      message: 'Error al subir imagen',
-
-      error: error.message
-
-    });
+    cb(new Error('Solo se permiten imágenes y videos'));
 
   }
 
 };
 
-export const subirVideo = async (req, res) => {
+const upload = multer({
 
-  try {
+  storage,
 
-    if (!req.file) {
+  fileFilter,
 
-      return res.status(400).json({
+  limits: {
 
-        message: 'No se recibió ningún video'
-
-      });
-
-    }
-
-    await guardarHistorial(
-
-      req.usuario?.id_usuario || 0,
-
-      'UPLOADS',
-
-      'SUBIR_VIDEO',
-
-      `Subió el video ${req.file.filename}`
-
-    );
-
-    res.json({
-
-      message: 'Video subido correctamente',
-
-      archivo: req.file.filename,
-
-      ruta: `/uploads/${req.file.filename}`
-
-    });
-
-  } catch (error) {
-
-    res.status(500).json({
-
-      message: 'Error al subir video',
-
-      error: error.message
-
-    });
+    fileSize: 100 * 1024 * 1024
 
   }
 
-};
+});
+
+export default upload;

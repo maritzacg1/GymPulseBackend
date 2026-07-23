@@ -1,48 +1,40 @@
 import { Router } from 'express';
-import { verifyToken } from '../jwt/verifyToken.js';
+
+import upload from '../middlewares/upload.js';
 
 import {
-  getUsuarios,
-  getUsuarioById,
-  getPerfil,
-  createUsuario,
-  updateUsuario,
-  deleteUsuario,
-  actualizarFoto,
-   getClientes,
-} from '../controladores/usuariosCtrl.js';
+
+  subirImagen,
+  subirVideo
+
+} from '../controladores/uploadCtrl.js';
+
+import { verifyToken } from '../jwt/verifyToken.js';
 
 const router = Router();
 
+router.post(
 
-router.get('/usuarios', verifyToken, getUsuarios);
+  '/upload',
 
-router.get('/perfil', verifyToken, getPerfil);
-
-router.get('/usuarios/:id', getUsuarioById);
-
-router.post('/usuarios', createUsuario);
-router.get('/clientes', verifyToken, getClientes);
-
-// Primero FOTO
-router.put(
-  '/usuarios/foto/:id',
   verifyToken,
-  actualizarFoto
+
+  upload.single('imagen'),
+
+  subirImagen
+
 );
 
+router.post(
 
-// Después UPDATE general
-router.put(
-  '/usuarios/:id',
-  updateUsuario
+  '/upload/video',
+
+  verifyToken,
+
+  upload.single('video'),
+
+  subirVideo
+
 );
-
-
-router.delete(
-  '/usuarios/:id',
-  deleteUsuario
-);
-
 
 export default router;
