@@ -1,4 +1,4 @@
-import { guardarHistorial } from './historialCtrl.js';
+import { guardarHistorial } from '../controladores/historialCtrl.js';
 
 export const subirImagen = async (req, res) => {
 
