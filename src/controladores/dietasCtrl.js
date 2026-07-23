@@ -5,17 +5,27 @@ import { guardarHistorial } from './historialCtrl.js';
    LISTAR DIETAS
 ========================================== */
 
-export const getDietas = async (req, res) => {
+export const getDietas = async (req,res)=>{
 
-  try {
+  try{
 
-    const [rows] = await connmysql.query(`
+    const [rows]=await connmysql.query(`
 
-      SELECT *
+      SELECT
+
+        id_dieta,
+        nombre,
+        descripcion,
+        calorias,
+        objetivo,
+        imagen,
+        alimentos,
+        comidas,
+        estado
 
       FROM dietas
 
-      WHERE estado = 1
+      WHERE estado=1
 
       ORDER BY nombre
 
@@ -23,13 +33,13 @@ export const getDietas = async (req, res) => {
 
     res.json(rows);
 
-  } catch (error) {
+  }catch(error){
 
     res.status(500).json({
 
-      message: 'Error al listar dietas',
+      message:'Error al listar dietas',
 
-      error: error.message
+      error:error.message
 
     });
 
@@ -37,33 +47,43 @@ export const getDietas = async (req, res) => {
 
 };
 
+
+
 /* ==========================================
    BUSCAR DIETA
 ========================================== */
 
-export const getDietaById = async (req, res) => {
+export const getDietaById = async(req,res)=>{
 
-  try {
+  try{
 
-    const { id } = req.params;
+    const {id}=req.params;
 
-    const [rows] = await connmysql.query(
+    const [rows]=await connmysql.query(`
 
-      `SELECT *
+      SELECT
 
-       FROM dietas
+        id_dieta,
+        nombre,
+        descripcion,
+        calorias,
+        objetivo,
+        imagen,
+        alimentos,
+        comidas,
+        estado
 
-       WHERE id_dieta = ?`,
+      FROM dietas
 
-      [id]
+      WHERE id_dieta=?
 
-    );
+    `,[id]);
 
-    if (rows.length === 0) {
+    if(rows.length===0){
 
       return res.status(404).json({
 
-        message: 'Dieta no encontrada'
+        message:'Dieta no encontrada'
 
       });
 
@@ -71,13 +91,13 @@ export const getDietaById = async (req, res) => {
 
     res.json(rows[0]);
 
-  } catch (error) {
+  }catch(error){
 
     res.status(500).json({
 
-      message: 'Error al buscar dieta',
+      message:'Error al buscar dieta',
 
-      error: error.message
+      error:error.message
 
     });
 
@@ -85,44 +105,56 @@ export const getDietaById = async (req, res) => {
 
 };
 
+
+
 /* ==========================================
    CREAR DIETA
 ========================================== */
 
-export const createDieta = async (req, res) => {
+export const createDieta = async(req,res)=>{
 
-  try {
+  try{
 
-    const {
+    const{
 
       nombre,
       descripcion,
       calorias,
-      objetivo
+      objetivo,
+      imagen,
+      alimentos,
+      comidas
 
-    } = req.body;
+    }=req.body;
 
-    const [result] = await connmysql.query(
+    const [result]=await connmysql.query(`
 
-      `INSERT INTO dietas
+      INSERT INTO dietas
       (
+
         nombre,
         descripcion,
         calorias,
-        objetivo
+        objetivo,
+        imagen,
+        alimentos,
+        comidas
+
       )
-      VALUES (?,?,?,?)`,
 
-      [
+      VALUES(?,?,?,?,?,?,?)
 
-        nombre,
-        descripcion,
-        calorias,
-        objetivo
+    `,[
 
-      ]
+      nombre,
+      descripcion,
+      calorias,
+      objetivo,
+      imagen || '',
+      alimentos || '',
+      comidas || ''
 
-    );
+    ]);
 
     await guardarHistorial(
 
@@ -138,49 +170,51 @@ export const createDieta = async (req, res) => {
 
     res.status(201).json({
 
-      message: 'Dieta registrada correctamente',
+      message:'Dieta registrada correctamente',
 
-      id_dieta: result.insertId
+      id_dieta:result.insertId
 
     });
 
-  } catch (error) {
+  }catch(error){
 
     res.status(500).json({
 
-      message: 'Error al registrar dieta',
+      message:'Error al registrar dieta',
 
-      error: error.message
+      error:error.message
 
     });
 
   }
 
 };
-
 /* ==========================================
    ACTUALIZAR DIETA
 ========================================== */
 
-export const updateDieta = async (req, res) => {
+export const updateDieta = async(req,res)=>{
 
-  try {
+  try{
 
-    const { id } = req.params;
+    const {id}=req.params;
 
-    const {
+    const{
 
       nombre,
       descripcion,
       calorias,
       objetivo,
+      imagen,
+      alimentos,
+      comidas,
       estado
 
-    } = req.body;
+    }=req.body;
 
-    const [result] = await connmysql.query(
+    const [result]=await connmysql.query(`
 
-      `UPDATE dietas
+      UPDATE dietas
 
       SET
 
@@ -188,28 +222,32 @@ export const updateDieta = async (req, res) => {
         descripcion=?,
         calorias=?,
         objetivo=?,
+        imagen=?,
+        alimentos=?,
+        comidas=?,
         estado=?
 
-      WHERE id_dieta=?`,
+      WHERE id_dieta=?
 
-      [
+    `,[
 
-        nombre,
-        descripcion,
-        calorias,
-        objetivo,
-        estado,
-        id
+      nombre,
+      descripcion,
+      calorias,
+      objetivo,
+      imagen,
+      alimentos,
+      comidas,
+      estado,
+      id
 
-      ]
+    ]);
 
-    );
-
-    if (result.affectedRows === 0) {
+    if(result.affectedRows===0){
 
       return res.status(404).json({
 
-        message: 'Dieta no encontrada'
+        message:'Dieta no encontrada'
 
       });
 
@@ -229,17 +267,19 @@ export const updateDieta = async (req, res) => {
 
     res.json({
 
-      message: 'Dieta actualizada correctamente'
+      message:'Dieta actualizada correctamente'
 
     });
 
-  } catch (error) {
+  }
+
+  catch(error){
 
     res.status(500).json({
 
-      message: 'Error al actualizar dieta',
+      message:'Error al actualizar dieta',
 
-      error: error.message
+      error:error.message
 
     });
 
@@ -247,33 +287,33 @@ export const updateDieta = async (req, res) => {
 
 };
 
+
+
 /* ==========================================
    ELIMINAR DIETA
 ========================================== */
 
-export const deleteDieta = async (req, res) => {
+export const deleteDieta = async(req,res)=>{
 
-  try {
+  try{
 
-    const { id } = req.params;
+    const {id}=req.params;
 
-    const [result] = await connmysql.query(
+    const [result]=await connmysql.query(`
 
-      `UPDATE dietas
+      UPDATE dietas
 
-      SET estado = 0
+      SET estado=0
 
-      WHERE id_dieta = ?`,
+      WHERE id_dieta=?
 
-      [id]
+    `,[id]);
 
-    );
-
-    if (result.affectedRows === 0) {
+    if(result.affectedRows===0){
 
       return res.status(404).json({
 
-        message: 'Dieta no encontrada'
+        message:'Dieta no encontrada'
 
       });
 
@@ -293,32 +333,37 @@ export const deleteDieta = async (req, res) => {
 
     res.json({
 
-      message: 'Dieta eliminada correctamente'
+      message:'Dieta eliminada correctamente'
 
     });
 
-  } catch (error) {
+  }
+
+  catch(error){
 
     res.status(500).json({
 
-      message: 'Error al eliminar dieta',
+      message:'Error al eliminar dieta',
 
-      error: error.message
+      error:error.message
 
     });
 
   }
 
 };
+
+
+
 /* ==========================================
-   ASIGNAR DIETA A UN USUARIO
+   ASIGNAR DIETA A USUARIO
 ========================================== */
 
-export const asignarDietaUsuario = async (req, res) => {
+export const asignarDietaUsuario = async(req,res)=>{
 
-  try {
+  try{
 
-    const {
+    const{
 
       id_usuario,
       id_dieta,
@@ -326,32 +371,33 @@ export const asignarDietaUsuario = async (req, res) => {
       fecha_fin,
       recomendaciones
 
-    } = req.body;
+    }=req.body;
 
-    const [result] = await connmysql.query(
+    const [result]=await connmysql.query(`
 
-      `INSERT INTO usuario_dieta
+      INSERT INTO usuario_dieta
       (
+
         id_usuario,
         id_dieta,
         fecha_inicio,
         fecha_fin,
         recomendaciones,
         estado
+
       )
-      VALUES (?,?,?,?,?,'Activa')`,
 
-      [
+      VALUES(?,?,?,?,?,'Activa')
 
-        id_usuario,
-        id_dieta,
-        fecha_inicio,
-        fecha_fin,
-        recomendaciones || ''
+    `,[
 
-      ]
+      id_usuario,
+      id_dieta,
+      fecha_inicio,
+      fecha_fin,
+      recomendaciones || ''
 
-    );
+    ]);
 
     await guardarHistorial(
 
@@ -361,7 +407,7 @@ export const asignarDietaUsuario = async (req, res) => {
 
       'ASIGNAR',
 
-      `Asignó la dieta ${id_dieta} al usuario ${id_usuario}`
+      `Asignó una dieta al usuario ID ${id_usuario}`
 
     );
 
@@ -373,7 +419,9 @@ export const asignarDietaUsuario = async (req, res) => {
 
     });
 
-  } catch(error){
+  }
+
+  catch(error){
 
     res.status(500).json({
 
@@ -386,17 +434,15 @@ export const asignarDietaUsuario = async (req, res) => {
   }
 
 };
-
-
 /* ==========================================
    DIETAS DE UN USUARIO
 ========================================== */
 
-export const getDietasUsuario = async (req,res)=>{
+export const getDietasUsuario = async(req,res)=>{
 
   try{
 
-    const { id } = req.params;
+    const {id}=req.params;
 
     const [rows]=await connmysql.query(`
 
@@ -417,6 +463,12 @@ export const getDietasUsuario = async (req,res)=>{
         d.calorias,
 
         d.objetivo,
+
+        d.imagen,
+
+        d.alimentos,
+
+        d.comidas,
 
         ud.fecha_inicio,
 
@@ -444,7 +496,9 @@ export const getDietasUsuario = async (req,res)=>{
 
     res.json(rows);
 
-  }catch(error){
+  }
+
+  catch(error){
 
     res.status(500).json({
 
@@ -457,6 +511,7 @@ export const getDietasUsuario = async (req,res)=>{
   }
 
 };
+
 
 
 /* ==========================================
@@ -491,7 +546,13 @@ export const getMiDieta = async(req,res)=>{
 
         d.calorias,
 
-        d.objetivo
+        d.objetivo,
+
+        d.imagen,
+
+        d.alimentos,
+
+        d.comidas
 
       FROM usuario_dieta ud
 
