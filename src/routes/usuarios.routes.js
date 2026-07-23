@@ -1,40 +1,35 @@
 import { Router } from 'express';
 
-import upload from '../middlewares/upload.js';
-
 import {
-
-  subirImagen,
-  subirVideo
-
-} from '../controladores/uploadCtrl.js';
+  getUsuarios,
+  getClientes,
+  getUsuarioById,
+  getPerfil,
+  createUsuario,
+  updateUsuario,
+  deleteUsuario,
+  actualizarFoto
+} from '../controladores/usuariosCtrl.js';
 
 import { verifyToken } from '../jwt/verifyToken.js';
 
 const router = Router();
 
-router.post(
+router.get('/usuarios', verifyToken, getUsuarios);
 
-  '/upload',
+router.get('/clientes', verifyToken, getClientes);
 
-  verifyToken,
+// ESTA RUTA ES LA QUE NECESITA EL PERFIL
+router.get('/usuarios/:id', verifyToken, getUsuarioById);
 
-  upload.single('imagen'),
+router.get('/perfil', verifyToken, getPerfil);
 
-  subirImagen
+router.post('/usuarios', verifyToken, createUsuario);
 
-);
+router.put('/usuarios/:id', verifyToken, updateUsuario);
 
-router.post(
+router.delete('/usuarios/:id', verifyToken, deleteUsuario);
 
-  '/upload/video',
-
-  verifyToken,
-
-  upload.single('video'),
-
-  subirVideo
-
-);
+router.put('/usuarios/foto/:id', verifyToken, actualizarFoto);
 
 export default router;
