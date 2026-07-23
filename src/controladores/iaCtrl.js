@@ -1,5 +1,5 @@
 import axios from 'axios';
-
+import { guardarHistorial } from './historialCtrl.js';
 export const preguntarIA = async (req, res) => {
 
   try {
@@ -48,7 +48,17 @@ Si preguntan otra cosa responde:
       }
 
     );
+await guardarHistorial(
 
+  req.usuario.id_usuario,
+
+  'IA',
+
+  'Consulta',
+
+  'Realizó una consulta a GymPulse AI'
+
+);
     res.json({
       respuesta:
         response.data.choices[0].message.content

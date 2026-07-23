@@ -1,5 +1,5 @@
 import { connmysql } from '../db.js';
-
+import { guardarHistorial } from './historialCtrl.js';
 export const getPagos = async (req, res) => {
   try {
     const [rows] = await connmysql.query(`
@@ -56,7 +56,17 @@ export const createPago = async (req, res) => {
       VALUES (?, ?, ?, ?, ?)`,
       [id_usuario, id_membresia, monto, metodo_pago, estado || 'Pagado']
     );
+await registrarActividad(
 
+    req.usuario.id_usuario,
+
+    'Pagos',
+
+    'Registrar',
+
+    `Registró un pago de $${monto}`
+
+);
     res.status(201).json({
       message: 'Pago registrado correctamente',
       id_pago: result.insertId
@@ -81,7 +91,17 @@ export const updatePago = async (req, res) => {
       WHERE id_pago = ?`,
       [id_usuario, id_membresia, monto, metodo_pago, estado, id]
     );
+await registrarActividad(
 
+    req.usuario.id_usuario,
+
+    'Pagos',
+
+    'Actualizar',
+
+    `Actualizó el pago ID ${id}`
+
+);
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: 'Pago no encontrado' });
     }
@@ -100,7 +120,17 @@ export const deletePago = async (req, res) => {
       `UPDATE pagos SET estado = 'Anulado' WHERE id_pago = ?`,
       [id]
     );
+await registrarActividad(
 
+    req.usuario.id_usuario,
+
+    'Pagos',
+
+    'Anular',
+
+    `Anuló el pago ID ${id}`
+
+);
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: 'Pago no encontrado' });
     }

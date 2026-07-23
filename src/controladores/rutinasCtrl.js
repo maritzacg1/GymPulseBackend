@@ -1,5 +1,5 @@
 import { connmysql } from '../db.js';
-
+import { guardarHistorial } from './historialCtrl.js';
 export const getRutinas = async (req, res) => {
   try {
     const [rows] = await connmysql.query(`
@@ -73,7 +73,12 @@ export const createRutina = async (req, res) => {
       VALUES (?, ?, ?, ?, ?)`,
       [id_entrenador, nombre, descripcion, objetivo, nivel]
     );
-
+await guardarHistorial(
+  req.usuario.id_usuario,
+  'RUTINAS',
+  'CREAR',
+  `Creó la rutina "${nombre}"`
+);
     res.status(201).json({
       message: 'Rutina registrada correctamente',
       id_rutina: result.insertId
@@ -103,7 +108,12 @@ export const updateRutina = async (req, res) => {
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: 'Rutina no encontrada' });
     }
-
+await guardarHistorial(
+  req.usuario.id_usuario,
+  'RUTINAS',
+  'ACTUALIZAR',
+  `Actualizó la rutina ID ${id}`
+);
     res.json({ message: 'Rutina actualizada correctamente' });
   } catch (error) {
     res.status(500).json({ message: 'Error al actualizar rutina', error: error.message });
@@ -155,7 +165,12 @@ export const deleteRutina = async (req, res) => {
       `UPDATE rutinas SET estado = 0 WHERE id_rutina = ?`,
       [id]
     );
-
+await guardarHistorial(
+  req.usuario.id_usuario,
+  'RUTINAS',
+  'ELIMINAR',
+  `Desactivó la rutina ID ${id}`
+);
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: 'Rutina no encontrada' });
     }
@@ -219,7 +234,12 @@ export const asignarRutina = async (req,res)=>{
         1
       )
     `,[id_usuario,id_rutina]);
-
+await guardarHistorial(
+  req.usuario.id_usuario,
+  'RUTINAS',
+  'ASIGNAR',
+  `Asignó la rutina ID ${id_rutina} al usuario ID ${id_usuario}`
+);
     res.json({
       message:'Rutina asignada'
     });
@@ -280,7 +300,12 @@ export const eliminarRutinaAsignada = async (req,res)=>{
       SET estado=0
       WHERE id_usuario_rutina=?
     `,[id]);
-
+await guardarHistorial(
+  req.usuario.id_usuario,
+  'RUTINAS',
+  'RETIRAR',
+  `Retiró la asignación de rutina ID ${id}`
+);
     res.json({
       message:'Rutina retirada'
     });

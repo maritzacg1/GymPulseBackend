@@ -2,7 +2,7 @@ import { connmysql } from '../db.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { config } from '../config.js';
-
+import { guardarHistorial } from './historialCtrl.js';
 /* ===========================
    LOGIN
 =========================== */
@@ -86,6 +86,18 @@ export const login = async (req, res) => {
     );
 
     delete usuario.password;
+
+    await guardarHistorial(
+
+  usuario.id_usuario,
+
+  'Login',
+
+  'Inicio de sesión',
+
+  `${usuario.nombres} ${usuario.apellidos} inició sesión`
+
+);
 
     res.json({
 
@@ -328,7 +340,17 @@ export const registrarCliente = async (req, res) => {
       ]
 
     );
+await guardarHistorial(
 
+  resultado.insertId,
+
+  'Usuarios',
+
+  'Registro',
+
+  `Nuevo cliente registrado: ${nombres} ${apellidos}`
+
+    );
     res.status(201).json({
 
       message: 'Cliente registrado correctamente',

@@ -1,5 +1,4 @@
 import { connmysql } from '../db.js';
-
 export const getProgresoUsuario = async (req, res) => {
   try {
     const { id } = req.params;

@@ -1,5 +1,5 @@
 import { connmysql } from '../db.js';
-
+import { guardarHistorial } from './historialCtrl.js';
 export const getAsistencias = async (req, res) => {
 
   try {
@@ -134,7 +134,17 @@ export const registrarAsistenciaQR = async (req, res) => {
       [id_usuario]
 
     );
+    await guardarHistorial(
 
+  id_usuario,
+
+  'Asistencias',
+
+  'Ingreso QR',
+
+  `${usuario[0].nombres} ${usuario[0].apellidos} ingresó al gimnasio mediante código QR`
+
+  );
     console.log("Asistencia registrada:", result.insertId);
 
     res.status(201).json({

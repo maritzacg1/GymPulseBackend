@@ -1,5 +1,5 @@
 import { connmysql } from '../db.js';
-
+import { guardarHistorial } from './historialCtrl.js';
 export const getMembresias = async (req, res) => {
   try {
     const [rows] = await connmysql.query('SELECT * FROM membresias WHERE estado = 1');
@@ -31,7 +31,17 @@ export const createMembresia = async (req, res) => {
        VALUES (?, ?, ?, ?)`,
       [nombre, descripcion, precio, duracion_dias]
     );
+await registrarActividad(
 
+    req.usuario.id_usuario,
+
+    'Membresías',
+
+    'Crear',
+
+    `Creó la membresía ${nombre}`
+
+);
     res.status(201).json({
       message: 'Membresía registrada correctamente',
       id_membresia: result.insertId
@@ -56,7 +66,17 @@ export const updateMembresia = async (req, res) => {
       WHERE id_membresia = ?`,
       [nombre, descripcion, precio, duracion_dias, estado, id]
     );
+await registrarActividad(
 
+    req.usuario.id_usuario,
+
+    'Membresías',
+
+    'Actualizar',
+
+    `Actualizó la membresía ${nombre}`
+
+);
     if (result.affectedRows === 0) return res.status(404).json({ message: 'Membresía no encontrada' });
 
     res.json({ message: 'Membresía actualizada correctamente' });
@@ -73,7 +93,17 @@ export const deleteMembresia = async (req, res) => {
       'UPDATE membresias SET estado = 0 WHERE id_membresia = ?',
       [id]
     );
+await registrarActividad(
 
+    req.usuario.id_usuario,
+
+    'Membresías',
+
+    'Eliminar',
+
+    `Eliminó la membresía ID ${id}`
+
+);
     if (result.affectedRows === 0) return res.status(404).json({ message: 'Membresía no encontrada' });
 
     res.json({ message: 'Membresía eliminada correctamente' });
@@ -91,7 +121,17 @@ export const asignarMembresiaUsuario = async (req, res) => {
       VALUES (?, ?, ?, ?, 'Activa')`,
       [id_usuario, id_membresia, fecha_inicio, fecha_fin]
     );
+await registrarActividad(
 
+    req.usuario.id_usuario,
+
+    'Membresías',
+
+    'Asignar',
+
+    `Asignó la membresía ${id_membresia} al usuario ${id_usuario}`
+
+);
     res.status(201).json({
       message: 'Membresía asignada correctamente',
       id_usuario_membresia: result.insertId
@@ -174,5 +214,6 @@ export const getMiMembresia = async (req,res)=>{
     });
 
   }
+  
 
 };

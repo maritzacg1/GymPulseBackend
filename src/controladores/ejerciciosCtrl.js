@@ -1,5 +1,5 @@
 import { connmysql } from '../db.js';
-
+import { guardarHistorial } from './historialCtrl.js';
 export const getEjercicios = async (req, res) => {
   try {
     const [rows] = await connmysql.query(`
@@ -62,6 +62,17 @@ export const createEjercicio = async (req, res) => {
       VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [id_categoria, nombre, descripcion, grupo_muscular, imagen, video, calorias_estimadas]
     );
+    await guardarHistorial(
+
+  req.usuario.id_usuario,
+
+  'Ejercicios',
+
+  'Crear',
+
+  `Se registró el ejercicio "${nombre}"`
+
+);
 
     res.status(201).json({
       message: 'Ejercicio registrado correctamente',
@@ -104,7 +115,17 @@ export const updateEjercicio = async (req, res) => {
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: 'Ejercicio no encontrado' });
     }
+await guardarHistorial(
 
+  req.usuario.id_usuario,
+
+  'Ejercicios',
+
+  'Actualizar',
+
+  `Se actualizó el ejercicio "${nombre}"`
+
+);
     res.json({ message: 'Ejercicio actualizado correctamente' });
   } catch (error) {
     res.status(500).json({ message: 'Error al actualizar ejercicio', error: error.message });
@@ -123,7 +144,17 @@ export const deleteEjercicio = async (req, res) => {
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: 'Ejercicio no encontrado' });
     }
+await guardarHistorial(
 
+  req.usuario.id_usuario,
+
+  'Ejercicios',
+
+  'Eliminar',
+
+  `Se eliminó el ejercicio con ID ${id}`
+
+);
     res.json({ message: 'Ejercicio eliminado correctamente' });
   } catch (error) {
     res.status(500).json({ message: 'Error al eliminar ejercicio', error: error.message });

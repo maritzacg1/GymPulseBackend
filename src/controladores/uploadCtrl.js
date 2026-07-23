@@ -1,3 +1,6 @@
+import { guardarHistorial } from './historialCtrl.js';
+
+
 export const subirImagen = async (req, res) => {
 
   try {
@@ -12,6 +15,15 @@ export const subirImagen = async (req, res) => {
 
     }
 
+
+    await guardarHistorial(
+      req.usuario.id_usuario,
+      'ARCHIVOS',
+      'SUBIR_IMAGEN',
+      `Subió la imagen "${req.file.filename}"`
+    );
+
+
     res.json({
 
       message: 'Imagen subida correctamente',
@@ -21,6 +33,7 @@ export const subirImagen = async (req, res) => {
       ruta: `/uploads/${req.file.filename}`
 
     });
+
 
   } catch (error) {
 
@@ -36,6 +49,8 @@ export const subirImagen = async (req, res) => {
 
 };
 
+
+
 export const subirVideo = async (req, res) => {
 
   try {
@@ -50,6 +65,15 @@ export const subirVideo = async (req, res) => {
 
     }
 
+
+    await guardarHistorial(
+      req.usuario.id_usuario,
+      'ARCHIVOS',
+      'SUBIR_VIDEO',
+      `Subió el video "${req.file.filename}"`
+    );
+
+
     res.json({
 
       message: 'Video subido correctamente',
@@ -59,6 +83,7 @@ export const subirVideo = async (req, res) => {
       ruta: `/uploads/${req.file.filename}`
 
     });
+
 
   } catch (error) {
 

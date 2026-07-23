@@ -1,5 +1,5 @@
 import { connmysql } from '../db.js';
-
+import { guardarHistorial } from './historialCtrl.js';
 export const getDietas = async (req, res) => {
   try {
     const [rows] = await connmysql.query(
@@ -39,6 +39,17 @@ export const createDieta = async (req, res) => {
        VALUES (?, ?, ?, ?)`,
       [nombre, descripcion, calorias, objetivo]
     );
+    await guardarHistorial(
+
+  req.usuario.id_usuario,
+
+  'Dietas',
+
+  'Crear',
+
+  `Se registró la dieta "${nombre}"`
+
+);
 
     res.status(201).json({
       message: 'Dieta registrada correctamente',
@@ -68,7 +79,17 @@ export const updateDieta = async (req, res) => {
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: 'Dieta no encontrada' });
     }
+await guardarHistorial(
 
+  req.usuario.id_usuario,
+
+  'Dietas',
+
+  'Actualizar',
+
+  `Se actualizó la dieta "${nombre}"`
+
+);
     res.json({ message: 'Dieta actualizada correctamente' });
   } catch (error) {
     res.status(500).json({ message: 'Error al actualizar dieta', error: error.message });
@@ -87,7 +108,17 @@ export const deleteDieta = async (req, res) => {
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: 'Dieta no encontrada' });
     }
+await guardarHistorial(
 
+  req.usuario.id_usuario,
+
+  'Dietas',
+
+  'Eliminar',
+
+  `Se eliminó la dieta con ID ${id}`
+
+);
     res.json({ message: 'Dieta eliminada correctamente' });
   } catch (error) {
     res.status(500).json({ message: 'Error al eliminar dieta', error: error.message });
