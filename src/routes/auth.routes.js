@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { login } from '../controladores/authCtrl.js';
+import { login, registrarCliente } from '../controladores/authCtrl.js';
 
 const router = Router();
 
