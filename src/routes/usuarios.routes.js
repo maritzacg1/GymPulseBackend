@@ -27,9 +27,8 @@ router.get('/perfil', verifyToken, getPerfil);
 router.post('/usuarios', verifyToken, createUsuario);
 
 router.put('/usuarios/:id', verifyToken, updateUsuario);
-
-router.delete('/usuarios/:id', verifyToken, deleteUsuario);
-
 router.put('/usuarios/foto/:id', verifyToken, actualizarFoto);
+
+router.put('/usuarios/:id', verifyToken, updateUsuario);
 
 export default router;
