@@ -4,6 +4,8 @@ dotenv.config();
 
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 import usuariosRoutes from './routes/usuarios.routes.js';
 import authRoutes from './routes/auth.routes.js';
@@ -24,6 +26,13 @@ import uploadRoutes from './routes/upload.routes.js';
 
 const app = express();
 
+/* ========= RUTA ABSOLUTA ========= */
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+/* ================================= */
+
 app.use(cors({
   origin: [
     'http://localhost:8100',
@@ -32,18 +41,31 @@ app.use(cors({
     'capacitor://localhost'
   ],
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET','POST','PUT','DELETE','OPTIONS'],
+  allowedHeaders: ['Content-Type','Authorization']
 }));
 
 app.options('*', cors());
 
 app.use(express.json());
 
+/* ========= CARPETA UPLOADS ========= */
+
+app.use(
+  '/uploads',
+  express.static(path.join(__dirname, 'uploads'))
+);
+
+/* =================================== */
+
 app.get('/', (req, res) => {
+
   res.json({
-    message: 'API GymPulse AI funcionando correctamente'
+
+    message:'API GymPulse AI funcionando correctamente'
+
   });
+
 });
 
 app.use('/api', usuariosRoutes);
@@ -62,7 +84,5 @@ app.use('/api', reportesRoutes);
 app.use('/api', iaRoutes);
 app.use('/api', historialRoutes);
 app.use('/api', uploadRoutes);
-
-app.use('/uploads', express.static('src/uploads'));
 
 export default app;
