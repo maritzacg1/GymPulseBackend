@@ -23,6 +23,7 @@ import reportesRoutes from './routes/reportes.routes.js';
 import iaRoutes from './routes/ia.routes.js';
 import historialRoutes from './routes/historial.routes.js';
 import uploadRoutes from './routes/upload.routes.js';
+import progresoFisicoRoutes from './routes/progresoFisico.routes.js';
 
 const app = express();
 
@@ -31,38 +32,60 @@ const app = express();
 ========================================== */
 
 const __filename = fileURLToPath(import.meta.url);
+
 const __dirname = path.dirname(__filename);
 
 /* ==========================================
    CORS
 ========================================== */
 
-app.use(cors({
-  origin: [
-    'http://localhost:8100',
-    'http://127.0.0.1:8100',
-    'https://localhost',
-    'capacitor://localhost'
-  ],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use(
+  cors({
+    origin: [
+      'http://localhost:8100',
+      'http://127.0.0.1:8100',
+      'https://localhost',
+      'capacitor://localhost'
+    ],
 
-app.options('*', cors());
+    credentials: true,
+
+    methods: [
+      'GET',
+      'POST',
+      'PUT',
+      'DELETE',
+      'OPTIONS'
+    ],
+
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization'
+    ]
+  })
+);
+
+app.options(
+  '*',
+  cors()
+);
 
 /* ==========================================
    Lectura del Body
 ========================================== */
 
-app.use(express.json({
-  limit: '15mb'
-}));
+app.use(
+  express.json({
+    limit: '15mb'
+  })
+);
 
-app.use(express.urlencoded({
-  extended: true,
-  limit: '15mb'
-}));
+app.use(
+  express.urlencoded({
+    extended: true,
+    limit: '15mb'
+  })
+);
 
 /* ==========================================
    Carpeta de imágenes
@@ -70,40 +93,117 @@ app.use(express.urlencoded({
 
 app.use(
   '/uploads',
-  express.static(path.join(__dirname, 'uploads'))
+  express.static(
+    path.join(
+      __dirname,
+      'uploads'
+    )
+  )
 );
 
 /* ==========================================
    Ruta principal
 ========================================== */
 
-app.get('/', (req, res) => {
+app.get(
+  '/',
+  (req, res) => {
 
-  res.json({
-    message: 'API GymPulse AI funcionando correctamente'
-  });
+    res.json({
+      message:
+        'API GymPulse AI funcionando correctamente'
+    });
 
-});
+  }
+);
 
 /* ==========================================
    API
 ========================================== */
 
-app.use('/api', usuariosRoutes);
-app.use('/api', authRoutes);
-app.use('/api', membresiasRoutes);
-app.use('/api', ejerciciosRoutes);
-app.use('/api', rutinasRoutes);
-app.use('/api', pagosRoutes);
-app.use('/api', asistenciasRoutes);
-app.use('/api', dashboardRoutes);
-app.use('/api', progresoRoutes);
-app.use('/api', dietasRoutes);
-app.use('/api', notificacionesRoutes);
-app.use('/api', entrenadoresRoutes);
-app.use('/api', reportesRoutes);
-app.use('/api', iaRoutes);
-app.use('/api', historialRoutes);
-app.use('/api', uploadRoutes);
+app.use(
+  '/api',
+  usuariosRoutes
+);
+
+app.use(
+  '/api',
+  authRoutes
+);
+
+app.use(
+  '/api',
+  membresiasRoutes
+);
+
+app.use(
+  '/api',
+  ejerciciosRoutes
+);
+
+app.use(
+  '/api',
+  rutinasRoutes
+);
+
+app.use(
+  '/api',
+  pagosRoutes
+);
+
+app.use(
+  '/api',
+  asistenciasRoutes
+);
+
+app.use(
+  '/api',
+  dashboardRoutes
+);
+
+app.use(
+  '/api',
+  progresoRoutes
+);
+
+app.use(
+  '/api',
+  dietasRoutes
+);
+
+app.use(
+  '/api',
+  notificacionesRoutes
+);
+
+app.use(
+  '/api',
+  entrenadoresRoutes
+);
+
+app.use(
+  '/api',
+  reportesRoutes
+);
+
+app.use(
+  '/api',
+  iaRoutes
+);
+
+app.use(
+  '/api',
+  historialRoutes
+);
+
+app.use(
+  '/api',
+  uploadRoutes
+);
+
+app.use(
+  '/api',
+  progresoFisicoRoutes
+);
 
 export default app;
