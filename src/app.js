@@ -22,7 +22,7 @@ import reportesRoutes from './routes/reportes.routes.js';
 import iaRoutes from './routes/ia.routes.js';
 import historialRoutes from './routes/historial.routes.js';
 import uploadRoutes from './routes/upload.routes.js';
-import progresoFisicoRoutes from './routes/progresoFisico.routes.js';
+import progresoRoutes from './routes/progreso.routes.js';
 
 const app = express();
 
@@ -199,7 +199,7 @@ app.use(
 
 app.use(
   '/api',
-  progresoFisicoRoutes
+  progresoRoutes
 );
 
 /* ==========================================
