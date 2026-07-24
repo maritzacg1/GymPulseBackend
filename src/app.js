@@ -26,16 +26,16 @@ import uploadRoutes from './routes/upload.routes.js';
 
 const app = express();
 
-/* ===========================
-   Ruta absoluta de src
-=========================== */
+/* ==========================================
+   Ruta absoluta de la carpeta src
+========================================== */
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-/* ===========================
+/* ==========================================
    CORS
-=========================== */
+========================================== */
 
 app.use(cors({
   origin: [
@@ -51,34 +51,43 @@ app.use(cors({
 
 app.options('*', cors());
 
-/* ===========================
-   JSON
-=========================== */
+/* ==========================================
+   Lectura del Body
+========================================== */
 
-app.use(express.json());
+app.use(express.json({
+  limit: '15mb'
+}));
 
-/* ===========================
-   Carpeta uploads
-=========================== */
+app.use(express.urlencoded({
+  extended: true,
+  limit: '15mb'
+}));
+
+/* ==========================================
+   Carpeta de imágenes
+========================================== */
 
 app.use(
   '/uploads',
   express.static(path.join(__dirname, 'uploads'))
 );
 
-/* ===========================
+/* ==========================================
    Ruta principal
-=========================== */
+========================================== */
 
 app.get('/', (req, res) => {
+
   res.json({
     message: 'API GymPulse AI funcionando correctamente'
   });
+
 });
 
-/* ===========================
-   Rutas API
-=========================== */
+/* ==========================================
+   API
+========================================== */
 
 app.use('/api', usuariosRoutes);
 app.use('/api', authRoutes);
