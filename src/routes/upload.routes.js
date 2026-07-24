@@ -1,61 +1,115 @@
-import { Router } from 'express';
-import upload from '../middlewares/upload.js';
+import express from 'express';
+import multer from 'multer';
 
-import {
-  subirImagen,
-  subirVideo
-} from '../controladores/uploadCtrl.js';
+import cloudinary from '../config/cloudinary.js';
 
-import { verifyToken } from '../jwt/verifyToken.js';
+const router = express.Router();
 
-const router = Router();
+const storage = multer.memoryStorage();
 
-/* ===============================
-   Subir imagen (general)
-================================ */
+const upload = multer({
+  storage,
+
+  limits: {
+    fileSize: 5 * 1024 * 1024
+  },
+
+  fileFilter: (req, file, callback) => {
+
+    const tiposPermitidos = [
+      'image/jpeg',
+      'image/jpg',
+      'image/png',
+      'image/webp'
+    ];
+
+    if (!tiposPermitidos.includes(file.mimetype)) {
+
+      return callback(
+        new Error(
+          'Solo se permiten imágenes JPG, PNG o WEBP'
+        )
+      );
+
+    }
+
+    callback(null, true);
+
+  }
+});
+
 
 router.post(
-
   '/upload',
-
-  verifyToken,
-
   upload.single('imagen'),
+  async (req, res) => {
 
-  subirImagen
+    try {
 
-);
+      if (!req.file) {
 
-/* ===============================
-   Subir imagen de dieta
-================================ */
+        return res.status(400).json({
+          message: 'Debe seleccionar una imagen'
+        });
 
-router.post(
+      }
 
-  '/upload/dieta',
+      const resultado = await new Promise(
+        (resolve, reject) => {
 
-  verifyToken,
+          const stream =
+            cloudinary.uploader.upload_stream(
+              {
+                folder: 'gympulse',
+                resource_type: 'image'
+              },
+              (error, resultadoCloudinary) => {
 
-  upload.single('imagen'),
+                if (error) {
 
-  subirImagen
+                  reject(error);
 
-);
+                } else {
 
-/* ===============================
-   Subir video
-================================ */
+                  resolve(resultadoCloudinary);
 
-router.post(
+                }
 
-  '/upload/video',
+              }
+            );
 
-  verifyToken,
+          stream.end(req.file.buffer);
 
-  upload.single('video'),
+        }
+      );
 
-  subirVideo
+      return res.status(201).json({
+        message: 'Imagen subida correctamente',
 
+        archivo: resultado.public_id,
+
+        ruta: resultado.secure_url,
+
+        url: resultado.secure_url,
+
+        public_id: resultado.public_id
+      });
+
+    } catch (error) {
+
+      console.error(
+        'Error al subir imagen:',
+        error
+      );
+
+      return res.status(500).json({
+        message: 'Error al subir la imagen',
+        error: error.message
+      });
+
+    }
+
+  }
 );
 
 export default router;
