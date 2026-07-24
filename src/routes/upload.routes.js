@@ -10,7 +10,10 @@ import { verifyToken } from '../jwt/verifyToken.js';
 
 const router = Router();
 
-// Subir imagen
+/* ===============================
+   Subir imagen (general)
+================================ */
+
 router.post(
 
   '/upload',
@@ -23,7 +26,26 @@ router.post(
 
 );
 
-// Subir video
+/* ===============================
+   Subir imagen de dieta
+================================ */
+
+router.post(
+
+  '/upload/dieta',
+
+  verifyToken,
+
+  upload.single('imagen'),
+
+  subirImagen
+
+);
+
+/* ===============================
+   Subir video
+================================ */
+
 router.post(
 
   '/upload/video',
