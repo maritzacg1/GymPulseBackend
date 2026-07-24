@@ -26,12 +26,16 @@ import uploadRoutes from './routes/upload.routes.js';
 
 const app = express();
 
-/* ========= RUTA ABSOLUTA ========= */
+/* ===========================
+   Ruta absoluta de src
+=========================== */
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-/* ================================= */
+/* ===========================
+   CORS
+=========================== */
 
 app.use(cors({
   origin: [
@@ -41,32 +45,40 @@ app.use(cors({
     'capacitor://localhost'
   ],
   credentials: true,
-  methods: ['GET','POST','PUT','DELETE','OPTIONS'],
-  allowedHeaders: ['Content-Type','Authorization']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.options('*', cors());
 
+/* ===========================
+   JSON
+=========================== */
+
 app.use(express.json());
 
-/* ========= CARPETA UPLOADS ========= */
+/* ===========================
+   Carpeta uploads
+=========================== */
 
 app.use(
   '/uploads',
   express.static(path.join(__dirname, 'uploads'))
 );
 
-/* =================================== */
+/* ===========================
+   Ruta principal
+=========================== */
 
 app.get('/', (req, res) => {
-
   res.json({
-
-    message:'API GymPulse AI funcionando correctamente'
-
+    message: 'API GymPulse AI funcionando correctamente'
   });
-
 });
+
+/* ===========================
+   Rutas API
+=========================== */
 
 app.use('/api', usuariosRoutes);
 app.use('/api', authRoutes);
