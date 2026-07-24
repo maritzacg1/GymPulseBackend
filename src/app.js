@@ -15,7 +15,6 @@ import rutinasRoutes from './routes/rutinas.routes.js';
 import pagosRoutes from './routes/pagos.routes.js';
 import asistenciasRoutes from './routes/asistencias.routes.js';
 import dashboardRoutes from './routes/dashboard.routes.js';
-import progresoRoutes from './routes/progreso.routes.js';
 import dietasRoutes from './routes/dietas.routes.js';
 import notificacionesRoutes from './routes/notificaciones.routes.js';
 import entrenadoresRoutes from './routes/entrenadores.routes.js';
@@ -31,9 +30,11 @@ const app = express();
    Ruta absoluta de la carpeta src
 ========================================== */
 
-const __filename = fileURLToPath(import.meta.url);
+const __filename =
+  fileURLToPath(import.meta.url);
 
-const __dirname = path.dirname(__filename);
+const __dirname =
+  path.dirname(__filename);
 
 /* ==========================================
    CORS
@@ -109,7 +110,7 @@ app.get(
   '/',
   (req, res) => {
 
-    res.json({
+    return res.json({
       message:
         'API GymPulse AI funcionando correctamente'
     });
@@ -163,11 +164,6 @@ app.use(
 
 app.use(
   '/api',
-  progresoRoutes
-);
-
-app.use(
-  '/api',
   dietasRoutes
 );
 
@@ -204,6 +200,44 @@ app.use(
 app.use(
   '/api',
   progresoFisicoRoutes
+);
+
+/* ==========================================
+   Ruta no encontrada
+========================================== */
+
+app.use(
+  (req, res) => {
+
+    return res.status(404).json({
+      message:
+        `Ruta no encontrada: ${req.method} ${req.originalUrl}`
+    });
+
+  }
+);
+
+/* ==========================================
+   Manejo general de errores
+========================================== */
+
+app.use(
+  (error, req, res, next) => {
+
+    console.error(
+      'Error general del servidor:',
+      error
+    );
+
+    return res.status(
+      error.status || 500
+    ).json({
+      message:
+        error.message ||
+        'Error interno del servidor'
+    });
+
+  }
 );
 
 export default app;
