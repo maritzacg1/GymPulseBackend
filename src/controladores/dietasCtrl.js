@@ -5,11 +5,11 @@ import { guardarHistorial } from './historialCtrl.js';
    LISTAR DIETAS
 ========================================== */
 
-export const getDietas = async (req,res)=>{
+export const getDietas = async (req, res) => {
 
-  try{
+  try {
 
-    const [rows]=await connmysql.query(`
+    const [rows] = await connmysql.query(`
 
       SELECT
 
@@ -25,7 +25,7 @@ export const getDietas = async (req,res)=>{
 
       FROM dietas
 
-      WHERE estado=1
+      WHERE estado = 1
 
       ORDER BY nombre
 
@@ -33,13 +33,15 @@ export const getDietas = async (req,res)=>{
 
     res.json(rows);
 
-  }catch(error){
+  }
+
+  catch (error) {
 
     res.status(500).json({
 
-      message:'Error al listar dietas',
+      message: 'Error al listar dietas',
 
-      error:error.message
+      error: error.message
 
     });
 
@@ -48,18 +50,17 @@ export const getDietas = async (req,res)=>{
 };
 
 
-
 /* ==========================================
    BUSCAR DIETA
 ========================================== */
 
-export const getDietaById = async(req,res)=>{
+export const getDietaById = async (req, res) => {
 
-  try{
+  try {
 
-    const {id}=req.params;
+    const { id } = req.params;
 
-    const [rows]=await connmysql.query(`
+    const [rows] = await connmysql.query(`
 
       SELECT
 
@@ -75,7 +76,7 @@ export const getDietaById = async(req,res)=>{
 
       FROM dietas
 
-      WHERE id_dieta=?
+      WHERE id_dieta = ?
 
     `,[id]);
 
@@ -91,7 +92,9 @@ export const getDietaById = async(req,res)=>{
 
     res.json(rows[0]);
 
-  }catch(error){
+  }
+
+  catch(error){
 
     res.status(500).json({
 
@@ -106,12 +109,11 @@ export const getDietaById = async(req,res)=>{
 };
 
 
-
 /* ==========================================
    CREAR DIETA
 ========================================== */
 
-export const createDieta = async(req,res)=>{
+export const createDieta = async (req,res)=>{
 
   try{
 
@@ -129,8 +131,7 @@ export const createDieta = async(req,res)=>{
 
     const [result]=await connmysql.query(`
 
-      INSERT INTO dietas
-      (
+      INSERT INTO dietas(
 
         nombre,
         descripcion,
@@ -176,7 +177,9 @@ export const createDieta = async(req,res)=>{
 
     });
 
-  }catch(error){
+  }
+
+  catch(error){
 
     res.status(500).json({
 
@@ -193,13 +196,13 @@ export const createDieta = async(req,res)=>{
    ACTUALIZAR DIETA
 ========================================== */
 
-export const updateDieta = async(req,res)=>{
+export const updateDieta = async (req, res) => {
 
-  try{
+  try {
 
-    const {id}=req.params;
+    const { id } = req.params;
 
-    const{
+    const {
 
       nombre,
       descripcion,
@@ -210,24 +213,24 @@ export const updateDieta = async(req,res)=>{
       comidas,
       estado
 
-    }=req.body;
+    } = req.body;
 
-    const [result]=await connmysql.query(`
+    const [result] = await connmysql.query(`
 
       UPDATE dietas
 
       SET
 
-        nombre=?,
-        descripcion=?,
-        calorias=?,
-        objetivo=?,
-        imagen=?,
-        alimentos=?,
-        comidas=?,
-        estado=?
+        nombre = ?,
+        descripcion = ?,
+        calorias = ?,
+        objetivo = ?,
+        imagen = ?,
+        alimentos = ?,
+        comidas = ?,
+        estado = ?
 
-      WHERE id_dieta=?
+      WHERE id_dieta = ?
 
     `,[
 
@@ -235,9 +238,9 @@ export const updateDieta = async(req,res)=>{
       descripcion,
       calorias,
       objetivo,
-      imagen,
-      alimentos,
-      comidas,
+      imagen || '',
+      alimentos || '',
+      comidas || '',
       estado,
       id
 
@@ -288,24 +291,23 @@ export const updateDieta = async(req,res)=>{
 };
 
 
-
 /* ==========================================
    ELIMINAR DIETA
 ========================================== */
 
-export const deleteDieta = async(req,res)=>{
+export const deleteDieta = async (req,res)=>{
 
   try{
 
-    const {id}=req.params;
+    const { id } = req.params;
 
-    const [result]=await connmysql.query(`
+    const [result] = await connmysql.query(`
 
       UPDATE dietas
 
-      SET estado=0
+      SET estado = 0
 
-      WHERE id_dieta=?
+      WHERE id_dieta = ?
 
     `,[id]);
 
@@ -352,18 +354,15 @@ export const deleteDieta = async(req,res)=>{
   }
 
 };
-
-
-
 /* ==========================================
-   ASIGNAR DIETA A USUARIO
+   ASIGNAR DIETA A UN USUARIO
 ========================================== */
 
-export const asignarDietaUsuario = async(req,res)=>{
+export const asignarDietaUsuario = async (req, res) => {
 
-  try{
+  try {
 
-    const{
+    const {
 
       id_usuario,
       id_dieta,
@@ -371,9 +370,9 @@ export const asignarDietaUsuario = async(req,res)=>{
       fecha_fin,
       recomendaciones
 
-    }=req.body;
+    } = req.body;
 
-    const [result]=await connmysql.query(`
+    const [result] = await connmysql.query(`
 
       INSERT INTO usuario_dieta
       (
@@ -387,7 +386,7 @@ export const asignarDietaUsuario = async(req,res)=>{
 
       )
 
-      VALUES(?,?,?,?,?,'Activa')
+      VALUES (?,?,?,?,?,'Activa')
 
     `,[
 
@@ -407,7 +406,7 @@ export const asignarDietaUsuario = async(req,res)=>{
 
       'ASIGNAR',
 
-      `Asignó una dieta al usuario ID ${id_usuario}`
+      `Asignó la dieta ID ${id_dieta} al usuario ID ${id_usuario}`
 
     );
 
@@ -415,7 +414,7 @@ export const asignarDietaUsuario = async(req,res)=>{
 
       message:'Dieta asignada correctamente',
 
-      id_usuario_dieta:result.insertId
+      id_usuario_dieta: result.insertId
 
     });
 
@@ -434,17 +433,19 @@ export const asignarDietaUsuario = async(req,res)=>{
   }
 
 };
+
+
 /* ==========================================
    DIETAS DE UN USUARIO
 ========================================== */
 
-export const getDietasUsuario = async(req,res)=>{
+export const getDietasUsuario = async (req, res) => {
 
-  try{
+  try {
 
-    const {id}=req.params;
+    const { id } = req.params;
 
-    const [rows]=await connmysql.query(`
+    const [rows] = await connmysql.query(`
 
       SELECT
 
@@ -482,13 +483,13 @@ export const getDietasUsuario = async(req,res)=>{
 
       INNER JOIN usuarios u
 
-      ON ud.id_usuario=u.id_usuario
+        ON ud.id_usuario = u.id_usuario
 
       INNER JOIN dietas d
 
-      ON ud.id_dieta=d.id_dieta
+        ON ud.id_dieta = d.id_dieta
 
-      WHERE ud.id_usuario=?
+      WHERE ud.id_usuario = ?
 
       ORDER BY ud.fecha_inicio DESC
 
@@ -511,20 +512,17 @@ export const getDietasUsuario = async(req,res)=>{
   }
 
 };
-
-
-
 /* ==========================================
    MI DIETA (CLIENTE)
 ========================================== */
 
-export const getMiDieta = async(req,res)=>{
+export const getMiDieta = async (req, res) => {
 
-  try{
+  try {
 
-    const id_usuario=req.usuario.id_usuario;
+    const id_usuario = req.usuario.id_usuario;
 
-    const [rows]=await connmysql.query(`
+    const [rows] = await connmysql.query(`
 
       SELECT
 
@@ -558,13 +556,13 @@ export const getMiDieta = async(req,res)=>{
 
       INNER JOIN dietas d
 
-      ON ud.id_dieta=d.id_dieta
+        ON ud.id_dieta = d.id_dieta
 
       WHERE
 
-        ud.id_usuario=?
+        ud.id_usuario = ?
 
-        AND ud.estado='Activa'
+        AND ud.estado = 'Activa'
 
       ORDER BY ud.fecha_fin DESC
 
