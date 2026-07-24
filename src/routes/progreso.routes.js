@@ -12,7 +12,7 @@ import {
   deleteProgreso,
   getMiProgreso
 
-} from '../controladores/progresoFisicoCtrl.js';
+} from '../controladores/progresoCtrl.js';
 
 import {
   verifyToken
